@@ -61,9 +61,35 @@
   .score{font-size:clamp(40px,13vw,70px);color:#fff;margin:0}
   .cause{font-family:system-ui,sans-serif;font-weight:800;font-size:16px;color:#ffe;margin:6px 0}
   .title{font-size:clamp(16px,4.8vw,22px);color:#ffd84a;margin:4px 0 8px}
-  #over .frame{width:min(48vw,210px)}
+  #over .frame{width:min(44vw,190px)}
+  #menu .frame{width:min(52vw,240px)}
   #mute{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:6;font-size:24px;background:rgba(0,0,0,.4);
     border:2px solid #000;border-radius:12px;padding:4px 10px;color:#fff;cursor:pointer}
+  .scr{touch-action:pan-y}
+  input{user-select:text;-webkit-user-select:text;-webkit-touch-callout:default;touch-action:auto;display:block;width:100%;margin:8px 0;
+    font:800 20px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 14px;border:3px solid #000;border-radius:12px;background:#fff6d6;color:#3a1200;outline:none}
+  input:focus{border-color:#ffd84a;box-shadow:0 0 0 3px #000}
+  .err{font-family:system-ui,sans-serif;font-weight:800;font-size:14px;color:#ffd0d0;min-height:20px;margin:4px 0 6px;white-space:pre-line}
+  #accTxt{white-space:pre-line}
+  .btn:disabled{opacity:.6}
+  .btn.grn{background:linear-gradient(#c8ffc0,#3ccf52 55%,#178a2a);color:#fff}
+  #profBtn{position:absolute;left:12px;top:max(12px,env(safe-area-inset-top));font-size:15px;padding:6px 10px;max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #menuKing{font-family:system-ui,sans-serif;font-weight:800;font-size:14px;color:#ffe98a;min-height:18px;margin:2px 0 4px;cursor:pointer}
+  #overLb{font-family:system-ui,sans-serif;font-weight:800;font-size:15px;color:#ffe98a;margin:2px 0 8px;cursor:pointer;min-height:20px}
+  #lb{justify-content:flex-start;padding-bottom:84px}
+  .lb{width:min(100%,520px);display:flex;flex-direction:column;gap:6px;margin:8px 0 10px}
+  .lbr{display:flex;align-items:center;gap:9px;background:rgba(0,0,0,.42);border:2px solid #000;border-radius:14px;padding:6px 10px;text-align:left}
+  .lbr.me{border-color:#ffd84a;background:rgba(255,216,74,.2);box-shadow:0 0 0 2px #000}
+  .lbr .rk{width:36px;flex:none;text-align:center;font-size:19px}
+  .lbr .av{width:42px;height:42px;flex:none;border-radius:50%;border:2px solid #e8b52a;background:#000 center/cover no-repeat}
+  .lbr .nm{flex:1;min-width:0;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lbr .nm small{display:block;font-family:system-ui,sans-serif;font-weight:700;font-size:11px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lbr .sc{flex:none;font-size:18px;color:#ffd84a}
+  .lbe{font-family:system-ui,sans-serif;font-weight:800;font-size:15px;opacity:.9;padding:10px}
+  #call{z-index:7;background:linear-gradient(#22344a,#0b1119 70%)}
+  #call .callav{font-size:96px;line-height:1;animation:ring .5s ease-in-out infinite;margin-bottom:8px}
+  @keyframes ring{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+  #callRes{max-width:340px;min-height:44px;font-size:17px}
 </style>
 </head>
 <body>
@@ -79,11 +105,14 @@
 </div>
 
 <div id="menu" class="scr bgk">
+  <button class="btn sm" id="profBtn">👤 Prijava</button>
   <h1 class="out" id="logo">KRALJ<br>ŠKOLJKE</h1>
   <div class="sub" id="menuSub"></div>
   <div class="frame wob" id="menuPic"></div>
+  <div id="menuKing"></div>
   <button class="btn" id="playBtn">🚽 SJEDNI NA TRON</button>
   <div class="row">
+    <button class="btn sm" id="lbBtn">🏆 Ljestvica</button>
     <button class="btn sm" id="galBtn">🖼️ Galerija</button>
     <button class="btn sm" id="instBtn">📲 Instaliraj</button>
   </div>
@@ -113,10 +142,49 @@
   <div class="title out" id="overTitle"></div>
   <p class="score out" id="overScore">0</p>
   <div class="sub" id="overBest"></div>
+  <div id="overLb"></div>
   <button class="btn" id="againBtn">🔁 OPET!</button>
   <div class="row">
+    <button class="btn sm" id="overLbBtn">🏆 Ljestvica</button>
     <button class="btn sm" id="shareBtn">📤 Pohvali se</button>
     <button class="btn sm" id="menuBtn">🏠 Izbornik</button>
+  </div>
+</div>
+
+<div id="lb" class="scr bgk">
+  <h2 class="out">🏆 KRALJEVSKA LJESTVICA</h2>
+  <div class="sub" id="lbSub">Najveći jedači hot dogova u kraljevstvu</div>
+  <div class="lb" id="lbList"></div>
+  <div class="row">
+    <button class="btn sm" id="lbAcc">👤 Registriraj se</button>
+    <button class="btn sm" id="lbRefresh">🔄 Osvježi</button>
+  </div>
+  <button class="btn" id="lbBack">⬅ NAZAD</button>
+</div>
+
+<div id="acc" class="scr bgk">
+  <div class="card">
+    <h2 class="out" id="accHead">👑 POSTANI KRALJ</h2>
+    <div class="cause" id="accTxt"></div>
+    <input id="accName" maxlength="16" placeholder="Kraljevsko ime" autocomplete="nickname" autocapitalize="words" spellcheck="false" enterkeyhint="next">
+    <input id="accPin" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="PIN (4 broja)" type="password" autocomplete="off" enterkeyhint="go">
+    <div class="err" id="accErr"></div>
+    <button class="btn" id="accGo">👑 REGISTRIRAJ ME</button>
+    <div class="row">
+      <button class="btn sm" id="accSwitch">Već imam račun → Prijava</button>
+      <button class="btn sm red" id="accBack">⬅ Nazad</button>
+    </div>
+  </div>
+</div>
+
+<div id="call" class="scr">
+  <div class="callav">👩</div>
+  <h2 class="out">MAMA 💕</h2>
+  <div class="sub">📞 dolazni poziv…</div>
+  <div class="cause" id="callRes"></div>
+  <div class="row" id="callBtns">
+    <button class="btn sm grn" id="callYes">📞 Javi se</button>
+    <button class="btn sm red" id="callNo">❌ Odbij</button>
   </div>
 </div>
 
