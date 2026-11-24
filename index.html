@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Kralj Školjke</title>
+<meta name="theme-color" content="#7a1020">
+<meta name="description" content="Najgluplja igrica na svijetu. Kralj leti na školjki i jede hot dogove.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/fav-64.png">
+<link rel="apple-touch-icon" href="icons/apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kralj Školjke">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  html,body{margin:0;height:100%;overflow:hidden;background:#1a0610;color:#fff;
+    font-family:"Arial Black","Impact",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;touch-action:none;overscroll-behavior:none}
+  #c{position:fixed;inset:0;display:block}
+  .scr{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:max(16px,env(safe-area-inset-top)) 18px max(16px,env(safe-area-inset-bottom));text-align:center;z-index:5;overflow:auto}
+  .scr.on{display:flex}
+  .bgk{background:radial-gradient(circle at 50% 30%,#c2272d 0%,#6d0f1e 55%,#2a0512 100%)}
+  .out{text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 4px 0 #000}
+  h1{font-size:clamp(34px,11vw,64px);line-height:.95;margin:6px 0 4px;color:#ffd84a;letter-spacing:1px;transform:rotate(-3deg)}
+  h2{font-size:clamp(22px,7vw,38px);margin:4px 0;color:#ffd84a}
+  .sub{font-family:system-ui,sans-serif;font-weight:700;font-size:14px;opacity:.9;margin:2px 0 10px}
+  .btn{font-family:inherit;font-size:clamp(18px,5.6vw,24px);color:#3a1200;background:linear-gradient(#fff1a8,#ffc928 55%,#e09a00);
+    border:3px solid #000;border-radius:16px;padding:12px 18px;margin:6px;min-width:230px;box-shadow:0 6px 0 #000;cursor:pointer}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #000}
+  .btn.sm{min-width:0;font-size:16px;padding:8px 12px}
+  .btn.red{background:linear-gradient(#ff9b9b,#e8333a 55%,#a3121a);color:#fff}
+  .frame{position:relative;width:min(62vw,280px);aspect-ratio:3/4;border:10px solid #e8b52a;border-radius:14px;
+    box-shadow:0 0 0 4px #000,0 0 0 9px #7a4b00,0 0 0 12px #000,0 12px 30px rgba(0,0,0,.6);background:#000 center/cover no-repeat;margin:10px auto 14px}
+  .frame.wob{animation:wob 2.2s ease-in-out infinite}
+  @keyframes wob{0%,100%{transform:rotate(-3deg) scale(1)}50%{transform:rotate(3deg) scale(1.03)}}
+  .tip{font-family:system-ui,sans-serif;font-weight:700;font-size:13px;opacity:.85;margin-top:10px;max-width:340px}
+  #load .bar{width:min(80vw,320px);height:22px;border:3px solid #000;border-radius:12px;background:#3a0a18;overflow:hidden;margin:16px auto 10px}
+  #load .fill{height:100%;width:0;background:linear-gradient(90deg,#ffd84a,#ff8a00)}
+  #loadTxt{font-family:system-ui,sans-serif;font-weight:800;min-height:24px}
+  #hud{position:fixed;left:0;right:0;top:0;display:none;justify-content:space-between;align-items:center;
+    padding:max(8px,env(safe-area-inset-top)) 12px 0;z-index:4;pointer-events:none;font-size:22px}
+  #hud.on{display:flex}
+  #hud .pb{pointer-events:auto;font-size:20px;background:rgba(0,0,0,.35);border:2px solid #000;border-radius:10px;padding:2px 10px;color:#fff;font-family:inherit}
+  #banner{position:fixed;left:50%;top:22%;transform:translate(-50%,-50%);z-index:4;pointer-events:none;
+    font-size:clamp(24px,7.6vw,44px);line-height:1.05;color:#ffd84a;width:94vw;max-width:560px;text-align:center;display:none}
+  #banner.on{display:block;animation:pop .5s cubic-bezier(.2,2,.4,1)}
+  #banner small{display:block;font-size:.45em;color:#fff}
+  @keyframes pop{0%{transform:translate(-50%,-50%) scale(.1) rotate(-30deg)}100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}
+  .card{background:rgba(0,0,0,.45);border:3px solid #000;border-radius:18px;padding:16px;max-width:380px;width:100%}
+  .q{font-size:clamp(20px,6vw,28px);margin:8px 0 14px}
+  #gal .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(100%,520px);margin:10px 0}
+  #gal .grid div{aspect-ratio:3/4;background:#000 center/cover;border:3px solid #e8b52a;border-radius:8px;cursor:pointer}
+  #gal{justify-content:flex-start;padding-bottom:84px}
+  #view{background:rgba(0,0,0,.92);z-index:7}
+  #view img{max-width:96vw;max-height:72vh;border:6px solid #e8b52a;border-radius:10px}
+  #viewCap{font-size:clamp(18px,5.5vw,26px);color:#ffd84a;margin:12px 8px}
+  #hint{z-index:8;background:rgba(0,0,0,.85)}
+  .row{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+  .score{font-size:clamp(40px,13vw,70px);color:#fff;margin:0}
+  .cause{font-family:system-ui,sans-serif;font-weight:800;font-size:16px;color:#ffe;margin:6px 0}
+  .title{font-size:clamp(16px,4.8vw,22px);color:#ffd84a;margin:4px 0 8px}
+  #over .frame{width:min(48vw,210px)}
+  #mute{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:6;font-size:24px;background:rgba(0,0,0,.4);
+    border:2px solid #000;border-radius:12px;padding:4px 10px;color:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="out"><span id="hScore">🌭 0</span><button class="pb" id="pauseBtn">⏸</button><span id="hLives">🧻🧻🧻</span></div>
+<div id="banner" class="out"></div>
+
+<div id="load" class="scr bgk on">
+  <h1 class="out">KRALJ<br>ŠKOLJKE</h1>
+  <div class="bar"><div class="fill" id="loadFill"></div></div>
+  <div id="loadTxt">Grijem dasku…</div>
+</div>
+
+<div id="menu" class="scr bgk">
+  <h1 class="out" id="logo">KRALJ<br>ŠKOLJKE</h1>
+  <div class="sub" id="menuSub"></div>
+  <div class="frame wob" id="menuPic"></div>
+  <button class="btn" id="playBtn">🚽 SJEDNI NA TRON</button>
+  <div class="row">
+    <button class="btn sm" id="galBtn">🖼️ Galerija</button>
+    <button class="btn sm" id="instBtn">📲 Instaliraj</button>
+  </div>
+  <div class="tip" id="tip"></div>
+</div>
+
+<div id="pause" class="scr" style="background:rgba(0,0,0,.6)">
+  <h2 class="out">PAUZA ZA WC</h2>
+  <div class="sub" id="pauseSub"></div>
+  <button class="btn" id="resumeBtn">▶ NASTAVI SJEDITI</button>
+  <button class="btn sm red" id="quitBtn">🏳️ Odustani</button>
+</div>
+
+<div id="quiz" class="scr" style="background:rgba(40,0,20,.8)">
+  <div class="card">
+    <h2 class="out">🧠 KRALJEVSKI KVIZ</h2>
+    <div class="q out" id="qText"></div>
+    <div class="row" id="qBtns"></div>
+    <div class="cause" id="qRes"></div>
+  </div>
+</div>
+
+<div id="over" class="scr bgk">
+  <h2 class="out" id="overHead">KRALJ JE PAO SA ŠKOLJKE!</h2>
+  <div class="cause" id="overCause"></div>
+  <div class="frame" id="overPic"></div>
+  <div class="title out" id="overTitle"></div>
+  <p class="score out" id="overScore">0</p>
+  <div class="sub" id="overBest"></div>
+  <button class="btn" id="againBtn">🔁 OPET!</button>
+  <div class="row">
+    <button class="btn sm" id="shareBtn">📤 Pohvali se</button>
+    <button class="btn sm" id="menuBtn">🏠 Izbornik</button>
+  </div>
+</div>
+
+<div id="gal" class="scr bgk">
+  <h2 class="out">🖼️ KRALJEVSKA GALERIJA</h2>
+  <div class="sub">Tapni sliku. Ne pitaj ništa.</div>
+  <div class="grid" id="galGrid"></div>
+  <button class="btn" id="galBack">⬅ NAZAD</button>
+</div>
+
+<div id="view" class="scr">
+  <img id="viewImg" alt="">
+  <div id="viewCap" class="out"></div>
+  <div class="row"><button class="btn sm" id="viewNext">➡ Sljedeća</button><button class="btn sm red" id="viewClose">✖ Zatvori</button></div>
+</div>
+
+<div id="hint" class="scr">
+  <div class="card">
+    <h2 class="out">📲 INSTALACIJA</h2>
+    <div class="cause" id="hintTxt"></div>
+    <button class="btn" id="hintOk">OK, KRALJU</button>
+  </div>
+</div>
+
+<button id="mute">🔊</button>
+
+<script src="game.js"></script>
+</body>
+</html>
