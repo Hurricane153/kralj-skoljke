@@ -1,4 +1,4 @@
-const V = 'kralj-skoljke-v3';
+const V = 'kralj-skoljke-v4';
 const FILES = ['./', 'index.html', 'game.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/apple-180.png', 'icons/fav-64.png'];
 for (let i = 0; i < 11; i++) FILES.push('img/face' + i + '.webp', 'img/p' + i + '.webp');

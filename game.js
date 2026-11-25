@@ -34,13 +34,16 @@ const TIPS = ['Savjet: hot dog dobro, brokula loše.', 'Savjet: 👑 pokreće ne
   'Savjet: morski psi ne bi trebali letjeti. Ali lete.', 'Savjet: tapni na sliku kralja.', 'Savjet: tapni naslov 5 puta. Ili nemoj.',
   'Savjet: registriraj se i postani Kralj kraljeva. 🏆', 'Savjet: 🎁 je iznenađenje. Ponekad loše.', 'Savjet: kad zazvoni mama, javi se. Ili nemoj.',
   'Savjet: kad je pod lava, ne stoj na podu.', 'Savjet: jedi hot dogove brzo zaredom za KOMBO.', 'Savjet: baka je spora, ali uporna.',
-  'Savjet: 🩴 dolazi od mame. Izbjegavaj.', 'Savjet: 🧲 privlači hot dogove. I probleme.'];
+  'Savjet: 🩴 dolazi od mame. Izbjegavaj.', 'Savjet: 🧲 privlači hot dogove. I probleme.',
+  'Svakih par stotina 🌭 nova razina — i nova pravila.', 'Savjet: u Dubinama sve dolazi ODOZDO.', 'Savjet: u Disko dvorcu sve pada u ritmu. Pleši.',
+  'Savjet: u Vulkanu su hot dogovi pečeni — duplo bodova.', 'Savjet: 🎵 gumb dolje desno gasi glazbu (ali zašto bi).', 'Razina 7 je TOTALNI KAOS. Nitko nije preživio. (laž)'];
 const SUBS = ['Verzija 0.0.1 — 100% bez bugova (laž)', 'Najgluplja igrica na svijetu™', 'Sad i s mirisom! (ne)',
   'Odobreno od strane Kralja', 'Igra godine 2026. (po izboru kralja)', 'Napravljeno u WC-u', 'Bez reklama, samo prdci',
-  'Verzija 2.0 — sad s bakom i papučama', 'Sad i s ljestvicom! Tko je pravi kralj?', 'Mama zove. Opet.'];
+  'Verzija 2.0 — sad s bakom i papučama', 'Sad i s ljestvicom! Tko je pravi kralj?', 'Mama zove. Opet.',
+  'Verzija 3.0 — sad s glazbom i razinama!', 'Sad i s disko kuglom 🪩', 'Glazbu je skladao kralj. Na školjci.'];
 const LOADS = ['Grijem dasku…', 'Punim vodokotlić…', 'Brišem senf s kamere…', 'Pregovaram s morskim psima…', 'Peglam plašt…',
   'Učitavam 4 GB hot dogova…', 'Kalibriram prdce…', 'Skrivam brokulu…', 'Glancam krunu…', 'Tražim hlače…', 'Odmotavam rolicu…',
-  'Zovem mamu…', 'Skrivam papuče…', 'Budim baku…', 'Brojim kraljeve na ljestvici…', 'Grijem lavu…'];
+  'Zovem mamu…', 'Skrivam papuče…', 'Budim baku…', 'Brojim kraljeve na ljestvici…', 'Grijem lavu…', 'Ugađam harmoniku…', 'Palim disko kuglu…', 'Pumpam vulkan…'];
 const CAPS = ['Službeni portret, 2026.', 'Kralj na radnom mjestu', 'Ovo je bio ozbiljan sastanak', 'Kad kažeš "samo još jedan hot dog"',
   'Ponedjeljak ujutro', 'Kralj odbija ustati', 'Ova slika visi u Louvreu (u WC-u)', 'Pogled kad netko pokuca', 'Kraljevska audijencija',
   'Snimljeno bez dozvole', 'Školjka je bila topla', 'Najskuplja slika na svijetu', 'Ne pitaj kako je tu dospio',
@@ -176,6 +179,126 @@ const SFX = {
 };
 function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { } }
 
+/* ---------------- GLAZBA (originalne melodije, sintetizirane uživo) ---------------- */
+const NOTE = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+const midi = t => { const m = /^([A-G]#?)(\d)$/.exec(t); return m ? NOTE[m[1]] + (+m[2] + 1) * 12 : null; };
+function parseSeq(str) {
+  const tk = str.replace(/\|/g, ' ').trim().split(/\s+/), out = tk.map(() => null);
+  for (let i = 0; i < tk.length; i++) {
+    const t = tk[i]; if (t === '.' || t === '-') continue;
+    let len = 1; while (tk[i + len] === '-') len++;
+    out[i] = /^[kshoc]+$/.test(t) ? { drum: t, len } : { notes: t.split('+').map(midi).filter(n => n != null), len };
+  }
+  return out;
+}
+const SONG_SRC = {
+  menu: { bpm: 104, sub: 2, ch: [ // valcer na školjci
+    ['sq', .16, 'A4 - C5 - F5 - | E5 - D5 - C5 - | A#4 - G4 - C5 - | E5 - - - . . | G4 - A#4 - E5 - | D5 - C5 - A#4 - | A4 - F4 - C5 - | F5 - - - . .'],
+    ['bass', .32, 'F2 - . . . . | C3 - . . . . | C3 - . . . . | G2 - . . . . | C3 - . . . . | G2 - . . . . | F2 - . . . . | C3 - . . . .'],
+    ['pluck', .1, '. . A3+C4 . A3+C4 . | . . A3+C4 . A3+C4 . | . . G3+A#3+E4 . G3+A#3+E4 . | . . G3+A#3+E4 . G3+A#3+E4 . | . . G3+A#3+E4 . G3+A#3+E4 . | . . G3+A#3+E4 . G3+A#3+E4 . | . . A3+C4 . A3+C4 . | . . A3+C4 . A3+C4 .']] },
+  polka: { bpm: 150, sub: 2, ch: [ // polka za školjku
+    ['sq', .15, 'C5 E5 G5 E5 | F5 E5 D5 C5 | B4 D5 F5 D5 | G5 - . G4 | A4 B4 C5 D5 | F5 E5 D5 B4 | C5 E5 G5 C6 | C6 - . .'],
+    ['bass', .34, 'C3 . G2 . | C3 . G2 . | G2 . D3 . | G2 . D3 . | G2 . D3 . | G2 . D3 . | C3 . G2 . | C3 . G2 .'],
+    ['pluck', .09, '. E3+G3+C4 . E3+G3+C4 | . E3+G3+C4 . E3+G3+C4 | . F3+B3+D4 . F3+B3+D4 | . F3+B3+D4 . F3+B3+D4 | . F3+B3+D4 . F3+B3+D4 | . F3+B3+D4 . F3+B3+D4 | . E3+G3+C4 . E3+G3+C4 | . E3+G3+C4 . E3+G3+C4'],
+    ['drum', .5, 'k h s h']] },
+  funk: { bpm: 112, sub: 4, ch: [ // gradska gužva
+    ['sqb', .3, 'E2 . . E2 . . G2 . A2 . . E2 . D2 . . | E2 . . E2 . . G2 . B2 . A2 . G2 . D2 E2'],
+    ['pluck', .08, '. . . . . . E4+G4+D5 . . . . . . . E4+G4+D5 . | . . . . . . E4+G4+D5 . . . . . . . . . | . . . . . . A4+C5+E5 . . . . . . . A4+C5+E5 . | . . . . . . G4+B4+D5 . . . . . . . F#4+A4+D5 .'],
+    ['sq', .12, '. . . . . . . . B4 - D5 - E5 - . . | . . . . . . . . D5 B4 A4 - G4 - . . | . . . . . . . . E5 - G5 - E5 - D5 - | B4 - - - . . . . . . . . . . . .'],
+    ['drum', .5, 'k . h . s . h k . k h . s . h h | k . h . s . h k . k h . s . o .']] },
+  sea: { bpm: 84, sub: 2, lp: 1500, ch: [ // duboka školjka
+    ['tri', .16, 'A4 C5 E5 A5 E5 C5 A4 E4 | F4 A4 C5 F5 C5 A4 F4 C4 | G4 C5 E5 G5 E5 C5 G4 E4 | G4 B4 D5 G5 D5 B4 G4 D4'],
+    ['bass', .3, 'A2 - - - - - - - | F2 - - - - - - - | C3 - - - - - - - | G2 - - - - - - -'],
+    ['sq', .07, 'E5 - - - D5 - C5 - | C5 - - - - - . . | E5 - G5 - E5 - D5 - | D5 - - - - - . . | E5 - - - D5 - C5 - | A4 - - - - - C5 - | B4 - G4 - B4 - D5 - | E5 - - - - - . .']] },
+  space: { bpm: 128, sub: 4, ch: [ // svemirska školjka
+    ['saw', .07, 'D4 F4 A4 D5 F5 D5 A4 F4 D4 F4 A4 D5 F5 D5 A4 F4 | A#3 D4 F4 A#4 D5 A#4 F4 D4 A#3 D4 F4 A#4 D5 A#4 F4 D4 | F3 A3 C4 F4 A4 F4 C4 A3 F3 A3 C4 F4 A4 F4 C4 A3 | C4 E4 G4 C5 E5 C5 G4 E4 C4 E4 G4 C5 E5 C5 G4 E4'],
+    ['sqb', .28, 'D2 . . . D2 . . . D3 . . . D2 . . . | A#1 . . . A#1 . . . A#2 . . . A#1 . . . | F2 . . . F2 . . . F3 . . . F2 . . . | C2 . . . C2 . . . C3 . . . C2 . . .'],
+    ['sq', .1, 'A5 - - - - - - - F5 - - - G5 - A5 - | F5 - - - - - - - D5 - - - . . . . | C5 - - - F5 - - - A5 - - - C6 - - - | G5 - - - - - - - E5 - - - . . . .'],
+    ['drum', .45, 'k . h . s . h . k . h k s . h .']] },
+  disco: { bpm: 124, sub: 4, ch: [ // disko dvorac
+    ['sqb', .28, 'A2 . A3 . A2 . A3 . A2 . A3 . A2 . A3 . | D2 . D3 . D2 . D3 . D2 . D3 . D2 . D3 . | G2 . G3 . G2 . G3 . G2 . G3 . G2 . G3 . | C3 . C4 . C3 . C4 . C3 . C4 . E2 . E3 .'],
+    ['sq', .12, 'A4 - C5 - E5 - A5 - G5 - E5 - C5 - D5 - | F5 - - - E5 - D5 - C5 - - - A4 - - - | B4 - D5 - G5 - B5 - A5 - G5 - F5 - D5 - | E5 - - - G5 - - - C6 - - - . . . .'],
+    ['pluck', .07, '. . . . . . A4+C5+E5 . . . . . . . A4+C5+E5 . | . . . . . . A4+D5+F5 . . . . . . . A4+D5+F5 . | . . . . . . B4+D5+G5 . . . . . . . B4+D5+G5 . | . . . . . . C5+E5+G5 . . . . . . . B4+E5+G#5 .'],
+    ['drum', .5, 'k h o h kc h o h k h o h kc h o h']] },
+  metal: { bpm: 168, sub: 2, ch: [ // vulkan
+    ['sqb', .3, 'E2 E2 E2 E2 E2 E2 G2 A2 | E2 E2 E2 E2 C3 C3 B2 B2 | E2 E2 E2 E2 E2 E2 G2 A2 | D3 D3 C3 C3 B2 B2 B2 B2'],
+    ['saw', .06, 'E3+B3 - . E3+B3 - . G3+D4 A3+E4 | E3+B3 - . E3+B3 C4+G4 - B3+F#4 - | E3+B3 - . E3+B3 - . G3+D4 A3+E4 | D4+A4 - C4+G4 - B3+F#4 - - -'],
+    ['sq', .11, 'E5 - G5 - F#5 - E5 - | B4 - - - . . . . | E5 - G5 - A5 - B5 - | A5 - G5 - F#5 - D5 - | E5 - G5 - F#5 - E5 - | B5 - - - A5 - G5 - | F#5 - G5 - A5 - F#5 - | E5 - - - . . . .'],
+    ['drum', .5, 'k h s h k k s h']] },
+  chaos: { bpm: 196, sub: 2, ch: [ // kaos polka
+    ['sq', .14, 'A5 G5 E5 C5 | A4 C5 E5 A5 | G#5 F5 E5 D5 | B4 D5 E5 G#5 | B5 A5 G#5 F5 | E5 D5 B4 G#4 | A4 C5 E5 A5 | A5 - . .'],
+    ['bass', .34, 'A2 . E2 . | A2 . E2 . | E2 . B2 . | E2 . B2 . | E2 . B2 . | E2 . B2 . | A2 . E2 . | A2 . E2 .'],
+    ['pluck', .09, '. A3+C4+E4 . A3+C4+E4 | . A3+C4+E4 . A3+C4+E4 | . G#3+D4+E4 . G#3+D4+E4 | . G#3+D4+E4 . G#3+D4+E4 | . G#3+D4+E4 . G#3+D4+E4 | . G#3+D4+E4 . G#3+D4+E4 | . A3+C4+E4 . A3+C4+E4 | . A3+C4+E4 . A3+C4+E4'],
+    ['drum', .5, 'k h s h']] },
+};
+const SONGS = {};
+for (const [id, s] of Object.entries(SONG_SRC)) SONGS[id] = { id, bpm: s.bpm, sub: s.sub, lp: s.lp || 18000, ch: s.ch.map(([i, v, q]) => ({ i, v, seq: parseSeq(q) })) };
+const MUS = { on: localStorage.getItem('ks_music') !== '0', song: null, step: 0, next: 0, timer: 0, gain: null, filt: null, rate: 1, tr: 0, vol: -1, lp: -1 };
+function musNode() {
+  const a = AC; if (!a) return null;
+  if (!MUS.gain) {
+    MUS.filt = a.createBiquadFilter(); MUS.filt.type = 'lowpass'; MUS.filt.frequency.value = 18000;
+    MUS.gain = a.createGain(); MUS.gain.gain.value = 0; MUS.filt.connect(MUS.gain); MUS.gain.connect(a.destination);
+  }
+  return MUS.filt;
+}
+function mNote(kind, n, t, dur, vol) {
+  const a = AC, out = musNode(); const o = a.createOscillator(), g = a.createGain();
+  let sus = .7, rel = .06, node = o;
+  o.type = { sq: 'square', pluck: 'square', sqb: 'square', bass: 'triangle', tri: 'triangle', saw: 'sawtooth' }[kind] || 'square';
+  o.frequency.value = 440 * Math.pow(2, (n + MUS.tr - 69) / 12);
+  if (kind === 'pluck') { dur = Math.min(dur, .09); sus = .25; }
+  if (kind === 'bass') { sus = .55; rel = .05; }
+  if (kind === 'sqb' || kind === 'saw') { const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = kind === 'sqb' ? 700 : 1800; o.connect(f); node = f; }
+  if (kind === 'sq' && dur > .25) { const l = a.createOscillator(), lg = a.createGain(); l.frequency.value = 5.5; lg.gain.value = 6; l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + dur + rel + .05); }
+  const dec = Math.min(.08, dur * .5), sv = Math.max(.0002, vol * sus);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .006); g.gain.exponentialRampToValueAtTime(sv, t + .006 + dec);
+  g.gain.setValueAtTime(sv, t + dur); g.gain.exponentialRampToValueAtTime(.0001, t + dur + rel);
+  node.connect(g); g.connect(out); o.start(t); o.stop(t + dur + rel + .03);
+}
+function mNoise(t, len, type, f, vol, q = 1) {
+  const a = AC, n = a.createBufferSource(); n.buffer = noiseBuf(a); const fl = a.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+  const g = a.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+  n.connect(fl); fl.connect(g); g.connect(musNode()); n.start(t, Math.random() * .5); n.stop(t + len + .02);
+}
+function mDrum(d, t, vol) {
+  const a = AC;
+  for (const c of d) {
+    if (c === 'k') { const o = a.createOscillator(), g = a.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + .12);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + .16); o.connect(g); g.connect(musNode()); o.start(t); o.stop(t + .18); }
+    if (c === 's') { mNoise(t, .13, 'bandpass', 1800, vol * .55, .7); }
+    if (c === 'h') mNoise(t, .035, 'highpass', 7000, vol * .22);
+    if (c === 'o') mNoise(t, .14, 'highpass', 6000, vol * .2);
+    if (c === 'c') { for (const d2 of [0, .011, .022]) mNoise(t + d2, .03, 'bandpass', 1400, vol * .4, 1.5); mNoise(t + .03, .12, 'bandpass', 1400, vol * .3, 1.5); }
+  }
+}
+function musTick() {
+  const a = AC, s = MUS.song; if (!a || !s || a.state !== 'running') return;
+  const spb = 60 / (s.bpm * MUS.rate) / s.sub;
+  if (MUS.next < a.currentTime - .05) MUS.next = a.currentTime + .05;
+  while (MUS.next < a.currentTime + .12) {
+    for (const ch of s.ch) {
+      const ev = ch.seq[MUS.step % ch.seq.length]; if (!ev) continue;
+      if (ev.drum) mDrum(ev.drum, MUS.next, ch.v);
+      else for (const n of ev.notes) mNote(ch.i, n, MUS.next, ev.len * spb * .92, ch.v);
+    }
+    MUS.step++; MUS.next += spb;
+  }
+}
+function musSet(id, vol, rate = 1, tr = 0, lp = 18000) {
+  const a = AC; if (!a) return;
+  const s = id && MUS.on && !muted ? SONGS[id] : null;
+  if (!s) vol = 0;
+  if (s && s !== MUS.song) { MUS.song = s; MUS.step = 0; MUS.next = a.currentTime + .06; }
+  if (!s && MUS.song && MUS.vol <= .001) MUS.song = null;
+  MUS.rate = rate; MUS.tr = tr;
+  if (!MUS.timer) MUS.timer = setInterval(musTick, 25);
+  musNode();
+  if (vol !== MUS.vol) { MUS.gain.gain.setTargetAtTime(vol, a.currentTime, vol > MUS.vol ? .25 : .12); MUS.vol = vol; }
+  lp = Math.min(lp, s ? s.lp : 18000);
+  if (lp !== MUS.lp) { MUS.filt.frequency.setTargetAtTime(lp, a.currentTime, .15); MUS.lp = lp; }
+}
+
 /* ---------------- STANJE ---------------- */
 const P = { x: 0, y: 0, scale: 1, head: 1, face: 10, faceOv: -1, inv: 0, tilt: 0, rot: 0, lx: 0, vx: 0, vy: 0 };
 const G = {
@@ -183,6 +306,7 @@ const G = {
   spawnT: 0, eventT: 0, ev: null, evLeft: 0, shake: 0, cause: '', quoteT: 0, quote: null, bomb: null, hist: [], cloneFaces: [],
   bg: 'sky', flash: 0, flipA: 0, windDir: 1, windT: 0, beatT: 0, fartT: 0, turboT: 0, dieT: 0, secret: false, lastEv: '', pending: [],
   combo: 0, comboT: 0, tm: [], baka: null, pola: null, flushT: 0, lavaK: 0, spinA: 0, lagQ: [], title: '', bnT: 0,
+  lvl: 0, lvlCard: null, beatC: 0, beatN: 0, pulse: 0, fireT: 0, carT: 0, chaosRule: '', chaosT: 0,
 };
 const after = (t, fn) => G.tm.push({ t, fn });
 
@@ -190,6 +314,37 @@ const GOOD = [{ e: '🌭', w: 10, k: 'dog' }, { e: '🌭', w: .3, k: 'gold' }, {
   { e: '🎁', w: .45, k: 'gift' }, { e: '🧲', w: .35, k: 'magnet' }];
 const PIZZA = { e: '🍕', k: 'pizza' }, DUCK = { e: '🦆', k: 'duck' };
 const SLIPPER = { e: '🩴', c: 'Mama je bacila papuču. Precizno, kao i uvijek.', spin: 1 };
+const FIRE = { e: '🔥', c: 'Pogodila ga je vatrena kugla iz vulkana. Vruće!' };
+const CARS = [{ e: '🚕', c: 'Pregazio ga je taksi. Školjka nema pojas.' }, { e: '🚌', c: 'Autobus broj 6 ne staje za kraljeve.' },
+  { e: '🛴', c: 'Romobil po nogostupu. Klasika.' }, { e: '🚓', c: 'Policija ga je zaustavila. Vožnja školjke bez dozvole.' }];
+const CITY_BAD = [{ e: '🚧', w: 2, c: 'Radovi na cesti. Opet.' }, { e: '💼', w: 2, c: 'Šef ga je vratio na posao' },
+  { e: '🅿️', w: 1.5, c: 'Kazna za parkiranje školjke' }, { e: '📧', w: 1.5, c: 'Stigao mu je mail od šefa' }, { e: '⏰', w: 1.5, c: 'Zazvonila budilica. Ponedjeljak je.' },
+  { e: '🐦', w: 2, c: 'Gradski golub mu je ukrao krunu', zig: 1 }, { e: '🧾', w: 1.5, c: 'Stigli su mu režije' }, { e: '🥦', w: 1.5, c: 'Pojeo brokulu. Zdravlje ga je ubilo.' }];
+const DISCO_BAD = [{ e: '💿', w: 2, c: 'Pogodila ga je ploča s turbo-folkom', spin: 1 }, { e: '🎤', w: 2, c: 'Mikrofon je pao s pozornice' },
+  { e: '🥂', w: 1.5, c: 'Netko je nazdravio preblizu' }, { e: '🪩', w: 1, c: 'Disko kugla je pala. Bilo je lijepo dok je trajalo.', spin: 1 },
+  { e: '🥦', w: 1.5, c: 'Pojeo brokulu. Zdravlje ga je ubilo.' }, { e: '🩴', w: 1.5, c: 'Mama je došla po njega u disko. S papučom.', spin: 1 }];
+const VOLC_BAD = [{ e: '🪨', w: 3, c: 'Kamen iz vulkana. Jako tvrd.', spin: 1 }, { e: '☄️', w: 2, c: 'Meteor. Jer zašto ne.' },
+  { e: '🧨', w: 1.5, c: 'Petarda. Netko je počeo slaviti Novu godinu.', spin: 1 },
+  { e: '🥵', w: 1.5, c: 'Pregrijao se. Kralj nije građen za vulkane.' }, { e: '🥦', w: 1.5, c: 'Pečena brokula. I dalje brokula.' }];
+const LEVELS = [
+  { at: 0, n: '👑 KRALJEVSKO NEBO', s: 'Pravila su normalna. Zasad.', bg: 'sky', song: 'polka', rule: '' },
+  { at: 100, n: '🏙️ GRADSKA GUŽVA', s: 'Taksiji jure vodoravno · sve pada brže', bg: 'city', song: 'funk', rule: 'city' },
+  { at: 250, n: '🌊 DUBINE', s: 'Gravitacija je OBRNUTA — sve dolazi ODOZDO!', bg: 'sea', song: 'sea', rule: 'up', excl: ['sea', 'bounce'] },
+  { at: 450, n: '🚀 BEZ GRAVITACIJE', s: 'Kralj klizi · stvari lete sa svih strana', bg: 'space', song: 'space', rule: 'zerog', excl: ['space', 'ice'] },
+  { at: 700, n: '🪩 DISKO DVORAC', s: 'Sve pada u ritmu · sve odskače od poda', bg: 'disco', song: 'disco', rule: 'disco', excl: ['disco', 'bounce'] },
+  { at: 1000, n: '🌋 VULKAN', s: 'Pod je lava · vatrene kugle · pečeni hot dogovi ×2', bg: 'volcano', song: 'metal', rule: 'volcano', excl: ['lava', 'heavy'] },
+  { at: 1350, n: '🤯 TOTALNI KAOS', s: 'Pravila se mijenjaju svakih 15 sekundi. Događaji stalno. Sretno.', bg: 'chaos', song: 'chaos', rule: 'chaos' },
+];
+const RULE_NAMES = { city: '🏙️ taksiji jure vodoravno', up: '🌊 sve dolazi ODOZDO', zerog: '🚀 kralj klizi', disco: '🪩 sve odskače u ritmu', volcano: '🌋 pod je lava' };
+function levelDef(i) {
+  if (i < LEVELS.length) return LEVELS[i];
+  const k = i - LEVELS.length, base = LEVELS[1 + (k % 5)];
+  return { ...base, at: 1350 + (k + 1) * 400, n: '💀 ' + base.n.replace(/^\S+\s/, '') + ' ' + roman(Math.floor(k / 5) + 2), s: 'HARDCORE: ' + base.s + ' · još brže', hard: 1.15 + .12 * k };
+}
+const lvl = () => levelDef(G.lvl);
+function rule(r) { const L = lvl(); return L.rule === r || (L.rule === 'chaos' && G.chaosRule === r); }
+const dirY = () => rule('up') ? -1 : 1;
+const sliding = () => evIs('ice') || rule('zerog');
 const BAD = [
   { e: '🪠', w: 3, c: 'Udaren klipom ravno u krunu', spin: 1 }, { e: '🥦', w: 3, c: 'Pojeo brokulu. Zdravlje ga je ubilo.' },
   { e: '🥗', w: 2, c: 'Netko mu je podvalio salatu' }, { e: '⏰', w: 2, c: 'Zazvonila budilica. Morao je na posao.' },
@@ -265,23 +420,56 @@ function hud() {
 function setPhoto(el, i) { el.style.backgroundImage = `url("${src('img/p' + i + '.webp')}")`; }
 
 /* ---------------- POZADINA ---------------- */
+const BG_N = { space: 70, sea: 26, city: 8, disco: 30, volcano: 40, chaos: 14 };
 function setBg(m) {
   G.bg = m; G.flash = 1; G.deco = [];
-  const n = m === 'space' ? 70 : m === 'sea' ? 26 : 9;
-  for (let i = 0; i < n; i++) G.deco.push(newDeco(rand(-.1, 1.1) * H));
+  const n = BG_N[m] || 9;
+  for (let i = 0; i < n; i++) G.deco.push(newDeco(rand(-.1, 1.1) * H, i));
 }
-function newDeco(y) {
+function newDeco(y, i = ri(0, 99)) {
   if (G.bg === 'space') return { x: rand(0, W), y, s: rand(.5, 2.4), sp: rand(.2, 1) };
   if (G.bg === 'sea') return { x: rand(0, W), y, s: rand(3, 10) * U, sp: rand(.3, 1) };
+  if (G.bg === 'city') { const w = rand(.16, .3) * W, h = rand(.35, .7) * H; return { side: i % 2 ? 1 : -1, w, h, y: y - h, seed: ri(1, 9999), sp: rand(.35, .55), col: pick(['#2a1846', '#331c55', '#24143d', '#3b2160']) }; }
+  if (G.bg === 'disco') return { x: rand(0, W), y, s: rand(1.5, 4) * U, sp: rand(.15, .5), c: pick(['#ff5bd1', '#5bf3ff', '#fff35b', '#9b5bff']) };
+  if (G.bg === 'volcano') return { x: rand(0, W), y, s: rand(1.2, 3.2) * U, sp: rand(.3, 1), ph: rand(0, 6) };
+  if (G.bg === 'chaos') return { x: rand(0, W), y, e: pick(['🌀', '✨', '❓', '🤪', '🌭', '👑', '🚽', '💫', '🙃', '🧻']), s: rand(18, 34) * U, sp: rand(.2, .6), r: rand(0, 6) };
   return { x: rand(-60, W + 60), y, s: rand(.6, 1.6) * U, sp: rand(.25, .6) };
 }
+function bgGrad(stops) { const g = ctx.createLinearGradient(0, 0, 0, H); stops.forEach((c, i) => g.addColorStop(i / (stops.length - 1), c)); return g; }
 function drawBg(dt, wsp) {
   let g;
-  if (G.bg === 'space') { g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#05000f'); g.addColorStop(1, '#2b0a4a'); }
-  else if (G.bg === 'sea') { g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0a3d62'); g.addColorStop(1, '#19a3c9'); }
-  else { g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#2f6fd0'); g.addColorStop(.55, '#8cc8ff'); g.addColorStop(1, '#ffb36b'); }
+  if (G.bg === 'space') g = bgGrad(['#05000f', '#2b0a4a']);
+  else if (G.bg === 'sea') g = bgGrad(['#0a3d62', '#19a3c9']);
+  else if (G.bg === 'city') g = bgGrad(['#140b2e', '#4b2368', '#ff8a5c']);
+  else if (G.bg === 'disco') g = bgGrad(['#0d0018', '#2a0040', '#3a0050']);
+  else if (G.bg === 'volcano') g = bgGrad(['#140202', '#3d0904', '#8a1a06']);
+  else if (G.bg === 'chaos') { const h = (G.t * 40) % 360; g = bgGrad([`hsl(${h},70%,35%)`, `hsl(${(h + 120) % 360},70%,45%)`, `hsl(${(h + 240) % 360},70%,40%)`]); }
+  else g = bgGrad(['#2f6fd0', '#8cc8ff', '#ffb36b']);
   ctx.fillStyle = g; ctx.fillRect(-30, -30, W + 60, H + 60);
+  if (G.bg === 'disco') { // reflektori
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    ['rgba(255,60,200,.16)', 'rgba(60,220,255,.16)', 'rgba(255,240,80,.13)'].forEach((c, i) => {
+      const a = Math.sin(G.t * (.7 + i * .3) + i * 2) * .7, x0 = W * (.2 + i * .3);
+      ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x0, -10); ctx.lineTo(x0 + Math.tan(a - .25) * H, H + 10); ctx.lineTo(x0 + Math.tan(a + .25) * H, H + 10); ctx.fill();
+    });
+    ctx.restore();
+    drawEmo('🪩', W / 2, 34 * U + 30, 46 * U * (1 + G.pulse * .12), G.t * 1.5);
+  }
   for (const d of G.deco) {
+    if (G.bg === 'city') {
+      d.y += wsp * d.sp * dt; if (d.y > H + 20) Object.assign(d, newDeco(-20, d.side > 0 ? 1 : 0));
+      const x = d.side < 0 ? 0 : W - d.w; ctx.fillStyle = d.col; ctx.fillRect(x, d.y, d.w, d.h);
+      ctx.fillStyle = 'rgba(255,214,110,.85)';
+      for (let r = 0, yy = d.y + 12 * U; yy < d.y + d.h - 10 && r < 40; r++, yy += 26 * U)
+        for (let c = 0, xx = x + 10 * U; xx < x + d.w - 14 * U; c++, xx += 22 * U) if ((d.seed * (r + 3) * (c + 7)) % 5 < 2) ctx.fillRect(xx, yy, 10 * U, 13 * U);
+      continue;
+    }
+    if (G.bg === 'disco') { d.y += wsp * d.sp * dt; if (d.y > H + 10) Object.assign(d, newDeco(-10)); ctx.fillStyle = d.c; ctx.globalAlpha = .5 + .5 * Math.sin(G.t * 6 + d.x); ctx.fillRect(d.x, d.y, d.s, d.s); ctx.globalAlpha = 1; continue; }
+    if (G.bg === 'volcano') {
+      d.y -= (50 + 110 * d.sp) * U * dt; d.x += Math.sin(G.t * 3 + d.ph) * .6; if (d.y < -10) Object.assign(d, newDeco(H + 10));
+      ctx.fillStyle = `rgba(255,${120 + 100 * d.sp | 0},40,${.5 + .5 * Math.sin(G.t * 9 + d.ph)})`; ctx.beginPath(); ctx.arc(d.x, d.y, d.s, 0, 7); ctx.fill(); continue;
+    }
+    if (G.bg === 'chaos') { d.y += wsp * d.sp * dt; d.r += dt * 2; if (d.y > H + 40) Object.assign(d, newDeco(-40)); drawEmo(d.e, d.x, d.y, d.s, d.r, .45); continue; }
     if (G.bg === 'sea') {
       d.y -= (40 + 60 * d.sp) * U * dt; d.x += Math.sin(G.t * 2 + d.y * .02) * .4;
       if (d.y < -20) Object.assign(d, newDeco(H + 20));
@@ -365,22 +553,40 @@ function kingHit(o) {
 function clampP() { const m = 24 * U * KS * P.scale; P.x = clamp(P.x, m, W - m); P.y = clamp(P.y, H * .12 + 40 * U * KS * P.scale, H - 44 * U * KS * P.scale); }
 
 /* ---------------- IGRA ---------------- */
-function scoreMult() { return (evIs('turbo') || evIs('double')) ? 2 : 1; }
+function scoreMult() { return ((evIs('turbo') || evIs('double')) ? 2 : 1) * (rule('volcano') ? 2 : 1); }
 function comboMult() { return G.combo >= 15 ? 3 : G.combo >= 6 ? 2 : 1; }
-function fallSpeed() { return (150 + Math.min(G.t, 120) * 2.2) * U; }
+function fallSpeed() { return (150 + Math.min(G.t, 120) * 2.2) * U * (rule('city') ? 1.2 : 1) * (lvl().hard || 1); }
 function lavaTop() { return H * (1 - .2 * G.lavaK); }
 function worldK() { return (evIs('slow') ? .45 : 1) * (evIs('turbo') ? 1.7 : 1) * (evIs('sea') ? .7 : 1); }
 
 function spawn(forceGood, opts = {}) {
   const goodP = G.secret ? .7 : .42;
   const good = forceGood != null ? forceGood : chance(goodP);
-  const tbl = good ? GOOD : (G.bg === 'sea' ? SEA_BAD : G.bg === 'space' ? SPACE_BAD : BAD);
-  let d = opts.d || wpick(tbl);
+  let d = opts.d || wpick(good ? GOOD : badTable());
   if (d.k === 'dog' && evIs('pizza')) d = PIZZA;
-  const size = (d.big ? rand(56, 70) : d.k === 'gold' ? 46 : rand(34, 44)) * U;
-  const o = { d, good, x: rand(size / 2, W - size / 2), y: opts.y != null ? opts.y : -size, vy: fallSpeed() * rand(.8, 1.25), vx: d.zig ? rand(-70, 70) * U : rand(-15, 15) * U,
+  const size = (d.big ? rand(56, 70) : d.k === 'gold' ? 46 : rand(34, 44)) * U, dir = dirY();
+  let y = opts.y != null ? opts.y : -size; if (dir < 0) y = H - y;
+  const o = { d, good, x: rand(size / 2, W - size / 2), y, vy: fallSpeed() * rand(.8, 1.25) * dir, vx: d.zig ? rand(-70, 70) * U : rand(-15, 15) * U,
     rot: rand(-.3, .3), vr: d.spin ? rand(-6, 6) : rand(-1.5, 1.5), size, ph: rand(0, 6.3) };
+  if (!opts.d && opts.y == null && rule('zerog') && chance(.45)) { // bez gravitacije: dolaze i sa strane
+    const l = chance(.5); Object.assign(o, { x: l ? -size : W + size, y: rand(H * .08, H * .72), vx: (l ? 1 : -1) * fallSpeed() * rand(.55, .85), vy: fallSpeed() * rand(-.15, .25), side: 1 });
+  }
   Object.assign(o, opts.o || {}); G.objs.push(o); return o;
+}
+function badTable() {
+  const T = { sea: SEA_BAD, space: SPACE_BAD, city: CITY_BAD, disco: DISCO_BAD, volcano: VOLC_BAD };
+  if (G.bg === 'chaos') return pick([BAD, SEA_BAD, SPACE_BAD, CITY_BAD, DISCO_BAD, VOLC_BAD]);
+  return T[G.bg] || BAD;
+}
+function spawnCar() {
+  const d = pick(CARS), l = chance(.5), sz = 50 * U;
+  G.objs.push({ d, good: false, x: l ? -sz - 110 * U : W + sz + 110 * U, y: rand(H * .18, H * .82), vy: 0, vx: (l ? 1 : -1) * rand(230, 330) * U * (lvl().hard || 1),
+    rot: 0, vr: 0, size: sz, ph: 0, side: 1, flipX: l });
+  SFX.tone('square', 440, 440, .09, .07); SFX.tone('square', 370, 370, .12, .07, .12);
+}
+function spawnFire() {
+  const o = spawn(false, { d: FIRE }); o.y = lavaTop() + 10 * U; o.vy = -fallSpeed() * rand(1.9, 2.5); o.vx = rand(-60, 60) * U; o.bn = 9; o.vr = rand(-4, 4);
+  SFX.tone('sawtooth', 120, 300, .2, .06);
 }
 function addText(t, x, y, px = 22, col = '#fff', life = 1) { G.texts.push({ t, x, y, px: px * U, col, life, max: life }); }
 function addPart(e, x, y, n = 6, sp = 160, size = 20) {
@@ -391,12 +597,13 @@ function startGame() {
   resize();
   Object.assign(G, { state: 'play', t: 0, score: 0, lives: 3, objs: [], parts: [], texts: [], spawnT: .6, eventT: rand(5, 8), ev: null, evLeft: 0, shake: 0,
     cause: 'Nitko ne zna što se dogodilo', quoteT: 2.5, bomb: null, hist: [], flipA: 0, pending: [], fartT: rand(8, 15), dieT: 0,
-    combo: 0, comboT: 0, tm: [], baka: null, pola: null, flushT: 0, lavaK: 0, spinA: 0, lagQ: [], bnT: 0, lastEv: '' });
+    combo: 0, comboT: 0, tm: [], baka: null, pola: null, flushT: 0, lavaK: 0, spinA: 0, lagQ: [], bnT: 0, lastEv: '',
+    lvl: 0, lvlCard: null, beatC: 0, beatN: 0, pulse: 0, fireT: 2, carT: 3, chaosRule: '', chaosT: 15 });
   Object.assign(P, { x: W / 2, y: H * .72, scale: 1, head: 1, face: ri(0, NF - 1), faceOv: -1, inv: 1, tilt: 0, rot: 0, lx: W / 2, vx: 0, vy: 0 });
   C.style.filter = '';
   G.quote = { t: pick(START_QUOTES), life: 2.2 };
   setBg('sky'); G.flash = 0; hudCache = ''; hud();
-  showScr(null); $('hud').classList.add('on'); $('mute').style.display = 'none';
+  showScr(null); $('hud').classList.add('on'); sndBtns(false);
   banner('🚽 POLIJEĆEMO!', G.secret ? 'TAJNI HOT DOG MOD 🤫' : 'vuci prstom po ekranu');
   SFX.fart(.7, 60, .5);
 }
@@ -418,7 +625,7 @@ function startEvent(e) {
 }
 function endEvent() {
   const e = G.ev; if (!e) return; G.ev = null;
-  if (e.id === 'sea' || e.id === 'space') setBg('sky');
+  if (e.id === 'sea' || e.id === 'space') setBg(lvl().bg);
   if (e.id === 'baka' && G.baka) { G.baka.leave = true; G.baka.q = pick(['Idem gledati sapunicu.', 'Još ćemo se vidjeti!', 'Pojedi nešto!']); G.baka.qT = 2; }
   if (e.id === 'sleepy') { for (const m of G.lagQ) { P.x += m.dx; P.y += m.dy; } G.lagQ = []; clampP(); }
   P.faceOv = -1; C.style.filter = ''; P.vx = P.vy = 0;
@@ -480,8 +687,23 @@ function instant(e) {
   }
 }
 function randomEvent(fromCrown) {
-  let pool = EVENTS.filter(e => e.id !== G.lastEv && (fromCrown || !G.ev || e.inst) && !((e.id === 'quiz' || e.id === 'mama') && G.t < 12));
+  const ex = lvl().excl || [];
+  let pool = EVENTS.filter(e => e.id !== G.lastEv && (fromCrown || !G.ev || e.inst) && !((e.id === 'quiz' || e.id === 'mama') && G.t < 12) && !ex.includes(e.id));
   startEvent(wpick(pool));
+}
+function levelUp() {
+  G.lvl++; const L = lvl();
+  if (G.ev) endEvent();
+  G.baka = null; G.bomb = null; G.pola = null; G.tm = []; G.lagQ = []; G.pending = [];
+  for (const o of G.objs) addPart(o.good ? '✨' : '💨', o.x, o.y, 2, 120, 18);
+  G.objs = [];
+  const gotLife = G.lives < 5; G.lives = Math.min(5, G.lives + 1); P.inv = 2.6; P.vx = P.vy = 0; G.combo = 0; G.comboT = 0;
+  G.chaosRule = L.rule === 'chaos' ? 'city' : ''; G.chaosT = 15; G.beatC = 0; G.fireT = 2.5; G.carT = 2.5;
+  setBg(L.bg); G.flash = .9;
+  P.y = rule('up') ? H * .32 : H * .7; clampP();
+  G.state = 'level'; G.lvlCard = { t: 0, dur: 3.2, life: gotLife }; G.quote = null; hudCache = ''; hud();
+  G.eventT = Math.max(G.eventT, 5);
+  [523, 659, 784, 1046, 784, 1046, 1318].forEach((f, i) => SFX.tone('square', f, f, .13, .09, i * .09)); SFX.boing(); buzz([80, 40, 80, 40, 250]);
 }
 
 function bumpCombo(o) {
@@ -529,8 +751,10 @@ function showOver() {
   $('overTitle').textContent = (prof ? prof.name + ', ' : '') + G.title;
   let rank = RANKS[0][1]; for (const [v, n] of RANKS) if (G.score >= v) rank = n;
   $('overScore').textContent = '🌭 ' + G.score;
-  $('overBest').textContent = (best && G.score > 0 ? '🎉 NOVI REKORD! 🎉  ' : `Rekord: ${G.best}  ·  `) + 'Rang: ' + rank;
-  $('mute').style.display = '';
+  const bl = +(localStorage.getItem('ks_bestLvl') || 1), nl = G.lvl + 1; if (nl > bl) localStorage.setItem('ks_bestLvl', nl);
+  $('overBest').textContent = (best && G.score > 0 ? '🎉 NOVI REKORD! 🎉  ' : `Rekord: ${G.best}  ·  `) + 'Rang: ' + rank +
+    `  ·  Razina ${nl} ${lvl().n.split(' ')[0]}` + (nl > bl && nl > 1 ? ' (NOVO!)' : '');
+  sndBtns(true);
   showScr('over');
   afterGame();
 }
@@ -574,13 +798,23 @@ function answerCall(yes) {
 const keys = {};
 function update(dt) {
   G.t += dt;
+  if (G.score >= levelDef(G.lvl + 1).at) { levelUp(); return; }
   const wk = worldK(), wdt = dt * wk;
+  // kaos: pravila se mijenjaju
+  if (lvl().rule === 'chaos') {
+    G.chaosT -= dt;
+    if (G.chaosT <= 0) {
+      G.chaosT = 15; G.chaosRule = pick(Object.keys(RULE_NAMES).filter(r => r !== G.chaosRule));
+      banner('🔀 NOVA PRAVILA!', RULE_NAMES[G.chaosRule]); SFX.fanfare(); buzz([60, 40, 60]);
+      G.objs = G.objs.filter(o => o.good && !o.side); P.vx = P.vy = 0;
+    }
+  }
   // tipkovnica
   const kx = (keys.ArrowRight || keys.d ? 1 : 0) - (keys.ArrowLeft || keys.a ? 1 : 0), ky = (keys.ArrowDown || keys.s ? 1 : 0) - (keys.ArrowUp || keys.w ? 1 : 0);
   if (kx || ky) move(kx * 340 * U * dt, ky * 340 * U * dt, true);
   // event
   if (G.ev) { G.evLeft -= dt; if (G.evLeft <= 0) endEvent(); }
-  G.eventT -= dt; if (G.eventT <= 0) { randomEvent(false); G.eventT = rand(6, 11); }
+  G.eventT -= dt; if (G.eventT <= 0) { randomEvent(lvl().rule === 'chaos'); G.eventT = lvl().rule === 'chaos' ? rand(3, 5) : rand(6, 11); }
   while (G.pending.length) startEvent(EV(G.pending.shift()));
   // timeri
   for (let i = G.tm.length - 1; i >= 0; i--) { const x = G.tm[i]; x.t -= dt; if (x.t <= 0) { G.tm.splice(i, 1); x.fn(); } }
@@ -596,18 +830,21 @@ function update(dt) {
   if (evIs('turbo')) { G.turboT -= dt; if (G.turboT <= 0) { G.turboT = .45; SFX.fart(.25, rand(60, 120), .25); } if (chance(dt * 20)) G.parts.push({ e: chance(.85) ? '💨' : '💩', x: P.x + rand(-10, 10), y: P.y + 40 * U * P.scale, vx: rand(-40, 40), vy: rand(120, 220) * U, life: .8, max: .8, size: 22 * U, rot: 0, vr: rand(-3, 3) }); }
   const flipT = evIs('flip') ? Math.PI : 0; G.flipA += (flipT - G.flipA) * Math.min(1, dt * 4);
   G.spinA += ((evIs('spin') ? Math.sin(G.t * 1.5) * .55 : 0) - G.spinA) * Math.min(1, dt * 3);
-  if (evIs('ice')) {
-    P.x += P.vx * dt; P.y += P.vy * dt; const f = Math.max(0, 1 - 1.3 * dt); P.vx *= f; P.vy *= f;
+  if (sliding()) {
+    P.x += P.vx * dt; P.y += P.vy * dt; const f = Math.max(0, 1 - (evIs('ice') ? 1.3 : 2.4) * dt); P.vx *= f; P.vy *= f;
     const m = 24 * U * KS * P.scale;
     if (P.x <= m || P.x >= W - m) P.vx *= -.7;
     if (P.y <= H * .12 + 40 * U * KS * P.scale || P.y >= H - 44 * U * KS * P.scale) P.vy *= -.7;
-    if (chance(dt * 8) && Math.hypot(P.vx, P.vy) > 120 * U) G.parts.push({ e: '💦', x: P.x, y: P.y + 40 * U, vx: -P.vx * .2, vy: 40 * U, life: .6, max: .6, size: 16 * U, rot: 0, vr: 2 });
+    if (chance(dt * 8) && Math.hypot(P.vx, P.vy) > 120 * U) G.parts.push({ e: rule('zerog') && !evIs('ice') ? '💨' : '💦', x: P.x, y: P.y + 40 * U, vx: -P.vx * .2, vy: 40 * U, life: .6, max: .6, size: 16 * U, rot: 0, vr: 2 });
   }
   if (evIs('sleepy')) {
     while (G.lagQ.length && G.lagQ[0].t <= G.t) { const m = G.lagQ.shift(); P.x += m.dx; P.y += m.dy; }
     if (chance(dt * 2.5)) G.parts.push({ e: '💤', x: P.x + 24 * U, y: P.y - 80 * U, vx: 30 * U, vy: -45 * U, life: 1.5, max: 1.5, size: 22 * U, rot: 0, vr: .5 });
   }
-  G.lavaK += ((evIs('lava') ? 1 : 0) - G.lavaK) * Math.min(1, dt * 3);
+  G.lavaK += ((evIs('lava') || rule('volcano') ? 1 : 0) - G.lavaK) * Math.min(1, dt * 3);
+  if (rule('volcano')) { G.fireT -= wdt; if (G.fireT <= 0) { G.fireT = rand(1, 1.9) / (lvl().hard || 1); spawnFire(); } }
+  if (rule('city')) { G.carT -= wdt; if (G.carT <= 0) { G.carT = rand(2.2, 4) / (lvl().hard || 1); spawnCar(); } }
+  G.pulse = Math.max(0, G.pulse - dt * 3.5);
   if (G.lavaK > .02 && chance(dt * 7 * G.lavaK)) G.parts.push({ e: chance(.6) ? '🔥' : '🫧', x: rand(0, W), y: lavaTop() + 8 * U, vx: 0, vy: -70 * U, life: .7, max: .7, size: 18 * U, rot: 0, vr: 0 });
   if (G.lavaK > .5 && G.state === 'play') {
     const s = P.scale * U * KS, top = lavaTop();
@@ -625,7 +862,7 @@ function update(dt) {
       b.x = clamp(b.x, -60, W + 60); b.y = clamp(b.y, -60, H + 60);
       b.throwT -= dt;
       if (b.throwT <= 0) {
-        b.throwT = rand(1.8, 3); const o = spawn(false, { d: SLIPPER, y: b.y }); o.x = b.x;
+        b.throwT = rand(1.8, 3); const o = spawn(false, { d: SLIPPER, y: b.y }); o.x = b.x; o.y = b.y;
         const dx = P.x - b.x, dy = P.y - b.y, d = Math.hypot(dx, dy) || 1; o.vx = dx / d * 240 * U; o.vy = Math.max(70 * U, dy / d * 240 * U);
         SFX.tone('triangle', 520, 200, .15, .1);
       }
@@ -646,7 +883,10 @@ function update(dt) {
   G.hist.unshift({ x: P.x, y: P.y }); if (G.hist.length > 60) G.hist.length = 60;
   // spawn
   const widthK = clamp(W / (420 * U), 1, 2.4);
-  G.spawnT -= wdt; if (G.spawnT <= 0) { spawn(); G.spawnT = Math.max(.3, .85 - G.t * .005) / widthK * rand(.7, 1.3); }
+  if (rule('disco')) { // sve pada u ritmu
+    const beat = 60 / 124 / (lvl().hard || 1); G.beatC += wdt;
+    if (G.beatC >= beat) { G.beatC -= beat; G.beatN++; G.pulse = 1; spawn(); if (G.beatN % 4 === 0 || widthK > 1.6) spawn(); }
+  } else { G.spawnT -= wdt; if (G.spawnT <= 0) { spawn(); G.spawnT = Math.max(.3, .85 - G.t * .005) / widthK * rand(.7, 1.3); } }
   // objekti
   for (let i = G.objs.length - 1; i >= 0; i--) {
     const o = G.objs[i];
@@ -660,14 +900,15 @@ function update(dt) {
     if (o.d.zig && !o.side) o.x += Math.sin(G.t * 3 + o.ph) * 90 * U * wdt;
     if (o.duck) o.y += Math.sin(G.t * 6 + o.ph) * 40 * U * dt;
     if (o.bn) o.vy += fallSpeed() * 1.5 * wdt;
-    if (evIs('bounce') && !o.side && o.vy > 0 && o.y > H - o.size * .6 && (o.bn || 0) < 3) {
+    if ((evIs('bounce') || rule('disco')) && !o.side && o.vy > 0 && o.y > H - o.size * .6 && (o.bn || 0) < 3) {
       o.vy = -fallSpeed() * rand(1.5, 2.1); o.bn = (o.bn || 0) + 1; o.vr = rand(-8, 8);
       if (G.bnT <= 0) { SFX.boing(); G.bnT = .3; }
     }
     if (evIs('magnet') && o.good) { const dx = P.x - o.x, dy = P.y - o.y; if (dx * dx + dy * dy < (Math.max(W, H) * .55) ** 2) { o.x += dx * 2.4 * dt; o.y += dy * 2.4 * dt; } }
     if (evIs('quake')) o.x += rand(-3, 3);
     if (!o.side && (o.x < o.size / 2 || o.x > W - o.size / 2)) { o.vx *= -1; o.x = clamp(o.x, o.size / 2, W - o.size / 2); }
-    if (o.y > H + o.size * 2 || (o.side && (o.x < -400 * U || o.x > W + 400 * U))) { G.objs.splice(i, 1); continue; }
+    if ((o.vy >= 0 && o.y > H + o.size * 2) || (o.vy < 0 && !o.bn && o.y < -o.size * 2 && (dirY() < 0 || o.side)) || o.y < -H * 1.5 || o.y > H * 2.5 ||
+      (o.side && (o.x < -400 * U || o.x > W + 400 * U))) { G.objs.splice(i, 1); continue; }
     if (G.state === 'play' && kingHit(o)) { G.objs.splice(i, 1); if (o.good) collect(o); else hurt(o); if (G.state !== 'play') break; }
   }
   // ostalo
@@ -716,10 +957,11 @@ function render(dt) {
     for (let i = 0; i < 6; i++) { ctx.strokeStyle = `rgba(150,215,255,${.55 * k})`; ctx.lineWidth = 7 * U; ctx.beginPath(); ctx.arc(0, 0, (18 + i * 24) * U, i, i + 3.4); ctx.stroke(); }
     ctx.restore(); drawEmo('🚽', W / 2, H * .45, 60 * U * k, Math.sin(G.t * 9) * .2, k);
   }
+  const pk = rule('disco') ? 1 + G.pulse * .16 : 1;
   for (const o of G.objs) {
     if (o.d.k === 'gold') { ctx.save(); ctx.globalAlpha = .5 + .3 * Math.sin(G.t * 10); ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(o.x, o.y, o.size * .65, 0, 7); ctx.fill(); ctx.restore(); }
     if (o.flipX) { ctx.save(); ctx.translate(o.x, o.y); ctx.scale(-1, 1); drawEmo(o.d.e, 0, 0, o.size, 0); ctx.restore(); }
-    else drawEmo(o.d.e, o.x, o.y, o.size, o.rot);
+    else drawEmo(o.d.e, o.x, o.y, o.size * pk, o.rot);
   }
   for (const p of G.parts) drawEmo(p.e, p.x, p.y, p.size, p.rot, clamp(p.life / p.max * 1.5, 0, 1));
   if (G.lavaK > .01) {
@@ -753,6 +995,14 @@ function render(dt) {
   // ekran (ne rotira se)
   if (G.ev && G.state === 'play') outText(`${G.ev.n.split(' ')[0]} ${Math.ceil(G.evLeft)}s`, W / 2, Math.max(64, 54 * U) + 4, 18 * U, '#ffd84a');
   if (G.combo >= 3 && G.state === 'play') outText(`🔥 ${G.combo}`, 12, Math.max(64, 54 * U) + 4, 17 * U, comboMult() > 1 ? '#ff9b3d' : '#fff', 'left');
+  if (G.state === 'play' || G.state === 'level' || G.state === 'pause' || G.state === 'quiz') { // razina + traka do sljedeće
+    const L = lvl(), nx = levelDef(G.lvl + 1), y0 = Math.max(64, 54 * U) + 4, bw = 66 * U, bh = 7 * U;
+    const ce = L.rule === 'chaos' && G.chaosRule ? ' ' + RULE_NAMES[G.chaosRule].split(' ')[0] : '';
+    outText(`R${G.lvl + 1} ${L.n.split(' ')[0]}${ce}`, W - 12, y0, 16 * U, '#fff', 'right');
+    const p = clamp((G.score - L.at) / (nx.at - L.at), 0, 1);
+    ctx.fillStyle = 'rgba(0,0,0,.5)'; rrect(W - 12 - bw, y0 + 12 * U, bw, bh, bh / 2); ctx.fill();
+    if (p > 0) { ctx.fillStyle = p > .85 ? (Math.floor(G.t * 6) % 2 ? '#ff9b3d' : '#ffd84a') : '#ffd84a'; rrect(W - 12 - bw, y0 + 12 * U, Math.max(bh, bw * p), bh, bh / 2); ctx.fill(); }
+  }
   if (G.pola) {
     const p = G.pola, img = photos[p.i];
     const k = clamp(p.t < .35 ? p.t / .35 : p.t > p.dur - .35 ? (p.dur - p.t) / .35 : 1, 0, 1);
@@ -782,6 +1032,21 @@ function render(dt) {
     if (k > .8) bubble(b.txt, clamp(b.side === 'l' ? x + R * .9 : b.side === 'r' ? x - R * .9 : x, 60, W - 60), b.side === 'b' ? y - R * 1.05 : y - R * .7, 17 * U);
   }
   if (G.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${G.flash})`; ctx.fillRect(0, 0, W, H); }
+  if (G.state === 'level' && G.lvlCard) drawLevelCard();
+}
+function drawLevelCard() {
+  const c = G.lvlCard, L = lvl();
+  const k = clamp(c.t < .3 ? c.t / .3 : c.t > c.dur - .3 ? (c.dur - c.t) / .3 : 1, 0, 1), e = 1 - Math.pow(1 - k, 3);
+  ctx.save(); ctx.globalAlpha = k * .6; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = k;
+  ctx.translate(W / 2, H * .4); const sc = .5 + .5 * e; ctx.scale(sc, sc); ctx.rotate((1 - e) * -.4 + Math.sin(G.t * 2.5) * .025);
+  const big = Math.min(42 * U, W * .09);
+  outText(`RAZINA ${G.lvl + 1}`, 0, -big * 1.7, big * .62, '#fff');
+  ctx.font = FONT(big); const tw = ctx.measureText(L.n).width, fs = tw > W * .9 ? big * W * .9 / tw : big;
+  outText(L.n, 0, -big * .5, fs, '#ffd84a');
+  ctx.font = FONT(17 * U); const lines = wrap(L.s, Math.min(W * .86, 420 * U));
+  lines.forEach((l, i) => outText(l, 0, big * .6 + i * 22 * U, 17 * U, '#fff'));
+  outText(c.life ? '+1 🧻 bonus život' : '🧻 rola je puna', 0, big * .6 + lines.length * 22 * U + 18 * U, 18 * U, '#7dff6b');
+  ctx.restore();
 }
 
 /* ---------------- INPUT ---------------- */
@@ -791,7 +1056,7 @@ function move(dx, dy, raw) {
   if (evIs('invert')) { dx = -dx; dy = -dy; }
   const k = raw ? 1 : 1.3 * (evIs('sea') ? .8 : 1);
   dx *= k; dy *= k;
-  if (evIs('ice')) {
+  if (sliding()) {
     const f = raw ? 5 : 1.5; P.vx += dx * f; P.vy += dy * f;
     const v = Math.hypot(P.vx, P.vy), mx = 650 * U; if (v > mx) { P.vx *= mx / v; P.vy *= mx / v; }
     return;
@@ -805,9 +1070,16 @@ const endDrag = e => { if (drag && e.pointerId === drag.id) drag = null; };
 C.addEventListener('pointerup', endDrag); C.addEventListener('pointercancel', endDrag);
 addEventListener('keydown', e => { if (e.target && e.target.tagName === 'INPUT') { if (e.key === 'Enter') accSubmit(); return; } keys[e.key.length === 1 ? e.key.toLowerCase() : e.key] = true; if ((e.key === 'Escape' || e.key === 'p') && G.state === 'play') pauseGame(); if (e.key.startsWith('Arrow')) e.preventDefault(); });
 addEventListener('keyup', e => { keys[e.key.length === 1 ? e.key.toLowerCase() : e.key] = false; });
-function pauseGame() { if (G.state !== 'play') return; G.state = 'pause'; $('pauseSub').textContent = pick(['Kralj je otišao po papir', 'Vodokotlić se puni…', 'Pauza je kraljevsko pravo', 'Kralj pere ruke (napokon)', 'Netko kuca na vrata']); overlay('pause', true); $('mute').style.display = ''; }
-function resumeGame() { overlay('pause', false); G.state = 'play'; drag = null; $('mute').style.display = 'none'; }
-document.addEventListener('visibilitychange', () => { if (document.hidden) pauseGame(); });
+function pauseGame() { if (G.state !== 'play') return; G.state = 'pause'; $('pauseSub').textContent = pick(['Kralj je otišao po papir', 'Vodokotlić se puni…', 'Pauza je kraljevsko pravo', 'Kralj pere ruke (napokon)', 'Netko kuca na vrata']); overlay('pause', true); sndBtns(true); }
+function resumeGame() { overlay('pause', false); G.state = 'play'; drag = null; sndBtns(false); }
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) pauseGame();
+  try { if (AC) { if (document.hidden) AC.suspend(); else AC.resume(); } } catch (e) { }
+});
+function sndBtns(on) { $('mute').style.display = $('musBtn').style.display = on ? '' : 'none'; }
+function musBtnUpd() { const b = $('musBtn'); b.classList.toggle('off', !MUS.on); b.title = MUS.on ? 'Glazba: uključena' : 'Glazba: isključena'; }
+// zvuk se smije pokrenuti tek nakon prvog dodira
+['pointerdown', 'touchend', 'keydown'].forEach(ev => addEventListener(ev, () => { if (!document.hidden) ac(); }, { passive: true, capture: true }));
 
 /* ---------------- GUMBI ---------------- */
 const tap = (id, fn) => $(id).addEventListener('click', e => { ac(); fn(e); });
@@ -828,6 +1100,11 @@ function openView(i) { viewIdx = i; $('viewImg').src = src('img/p' + i + '.webp'
 tap('viewNext', () => { openView((viewIdx + 1) % NF); SFX.fart(rand(.2, .5), rand(70, 140), .25); });
 tap('viewClose', () => overlay('view', false));
 tap('mute', () => { muted = !muted; localStorage.setItem('ks_mute', muted ? '1' : '0'); $('mute').textContent = muted ? '🔇' : '🔊'; if (!muted) SFX.fart(.4, 80, .4); });
+tap('musBtn', () => {
+  MUS.on = !MUS.on; localStorage.setItem('ks_music', MUS.on ? '1' : '0'); musBtnUpd();
+  if (MUS.on && muted) { muted = false; localStorage.setItem('ks_mute', '0'); $('mute').textContent = '🔊'; }
+  if (!MUS.on) SFX.tone('triangle', 520, 260, .18, .12);
+});
 tap('callYes', () => answerCall(true));
 tap('callNo', () => answerCall(false));
 tap('lbBtn', () => openLb());
@@ -847,10 +1124,11 @@ tap('shareBtn', async () => {
   try { await navigator.clipboard.writeText(text + (url ? ' ' + url : '')); $('overBest').textContent = '📋 Kopirano! Zalijepi prijateljima.'; } catch (e) { $('overBest').textContent = text; }
 });
 function toMenu() {
-  G.state = 'menu'; overlay('view', false); $('hud').classList.remove('on'); $('mute').style.display = ''; C.style.filter = '';
+  G.state = 'menu'; overlay('view', false); $('hud').classList.remove('on'); sndBtns(true); C.style.filter = '';
   menuPic = ri(0, NF - 1); setPhoto($('menuPic'), menuPic);
   $('menuSub').textContent = G.secret ? '🤫 TAJNI HOT DOG MOD UKLJUČEN' : pick(SUBS);
-  $('tip').textContent = pick(TIPS) + (G.best ? `  ·  Rekord: 🌭 ${G.best}` : '');
+  const bl = +(localStorage.getItem('ks_bestLvl') || 1);
+  $('tip').textContent = pick(TIPS) + (G.best ? `  ·  Rekord: 🌭 ${G.best}` + (bl > 1 ? ` · razina ${bl}` : '') : '');
   lbFrom = 'menu'; updProf(); showScr('menu'); menuKing();
 }
 
@@ -885,7 +1163,7 @@ async function keyFor(name, pin) {
 function recordGame() {
   const st = getStats(); st.games++; st.dogs += G.score;
   const cur = Math.max(st.pb ? st.pb.s : 0, prof ? prof.srvBest || 0 : 0);
-  if (G.score > cur) st.pb = { s: G.score, dur: Math.round(G.t), cause: G.cause, title: G.title, face: P.face };
+  if (G.score > cur) st.pb = { s: G.score, dur: Math.round(G.t), cause: G.cause, title: G.title, face: P.face, lvl: G.lvl + 1 };
   st.dirty = true; LS.set(statKey(), st);
 }
 async function sync() {
@@ -914,7 +1192,8 @@ async function afterGame() {
 function lbRow(p, r, me) {
   const d = document.createElement('div'); d.className = 'lbr' + (me ? ' me' : '');
   const f = p.f >= 0 && p.f < NF ? p.f : hashName(p.n) % NF;
-  d.innerHTML = `<span class="rk">${r === 1 ? '👑' : r === 2 ? '🥈' : r === 3 ? '🥉' : '#' + r}</span><span class="av"></span><span class="nm"></span><span class="sc">🌭 ${+p.b || 0}</span>`;
+  const lv = Math.max(1, Math.min(99, +p.l || 1)), le = levelDef(lv - 1).n.split(' ')[0];
+  d.innerHTML = `<span class="rk">${r === 1 ? '👑' : r === 2 ? '🥈' : r === 3 ? '🥉' : '#' + r}</span><span class="av"></span><span class="nm"></span><span class="sc">🌭 ${+p.b || 0}${p.l ? `<small>R${lv} ${le}</small>` : ''}</span>`;
   d.querySelector('.av').style.backgroundImage = `url("${src('img/face' + f + '.webp')}")`;
   const nm = d.querySelector('.nm'); nm.textContent = p.n;
   const s1 = document.createElement('small'); s1.textContent = p.t || (p.g ? `${p.g} ${plural(p.g, ['igra', 'igre', 'igara'])}, bez titule` : 'još nije sjeo na tron'); nm.appendChild(s1);
@@ -1026,13 +1305,40 @@ let last = performance.now();
 function frame(now) {
   const dt = Math.min(.05, (now - last) / 1000); last = now;
   if (G.state === 'play') update(dt);
-  if (G.state === 'play' || G.state === 'dying') updateFx(dt);
-  if (G.state === 'play' || G.state === 'dying' || G.state === 'pause' || G.state === 'quiz') render(G.state === 'pause' || G.state === 'quiz' ? 0 : dt);
+  else if (G.state === 'level') {
+    G.t += dt; G.lvlCard.t += dt;
+    if (G.lvlCard.t >= G.lvlCard.dur) { G.state = 'play'; G.lvlCard = null; drag = null; addText('KRENI! 🚀', W / 2, H * .45, 36, '#ffd84a', 1.1); SFX.fart(.6, 55, .4); }
+  }
+  if (G.state === 'play' || G.state === 'dying' || G.state === 'level') updateFx(dt);
+  if (G.state === 'play' || G.state === 'dying' || G.state === 'pause' || G.state === 'quiz' || G.state === 'level') render(G.state === 'pause' || G.state === 'quiz' ? 0 : dt);
+  musUpdate();
   requestAnimationFrame(frame);
+}
+function musUpdate() {
+  if (!AC) return;
+  const st = G.state; let id = null, vol = .62, rate = 1, tr = 0, lp = 18000;
+  if (st === 'menu') id = 'menu';
+  else if (st === 'over') { id = 'menu'; vol = .4; }
+  else if (st === 'play' || st === 'level' || st === 'pause' || st === 'quiz') {
+    id = lvl().song;
+    if (evIs('disco')) id = 'disco'; else if (evIs('space')) id = 'space'; else if (evIs('sea')) id = 'sea'; else if (evIs('lava')) id = 'metal';
+    if (evIs('slow')) { rate = .7; tr = -2; }
+    if (evIs('turbo')) { rate = 1.35; tr = 2; }
+    if (evIs('baka')) rate = 1.15;
+    if (evIs('sleepy')) { rate = .6; lp = 900; }
+    if (evIs('dark')) lp = 700;
+    if (evIs('sea')) lp = 1300;
+    if (evIs('flip')) tr = -5;
+    if (evIs('giant')) tr = -7;
+    if (evIs('mini')) tr = 7;
+    if (st === 'pause') { vol *= .35; lp = Math.min(lp, 1200); }
+    if (st === 'quiz') vol *= .3;
+  }
+  musSet(id, vol, rate, tr, lp);
 }
 function loadImg(p) { return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src(p); }); }
 (async function boot() {
-  resize(); $('mute').textContent = muted ? '🔇' : '🔊';
+  resize(); $('mute').textContent = muted ? '🔇' : '🔊'; musBtnUpd();
   const grid = $('galGrid');
   for (let i = 0; i < NF; i++) { const d = document.createElement('div'); setPhoto(d, i); d.onclick = () => { ac(); openView(i); SFX.fart(rand(.2, .6), rand(60, 140), .3); }; grid.appendChild(d); }
   let done = 0; const total = NF * 2; const t0 = performance.now();
